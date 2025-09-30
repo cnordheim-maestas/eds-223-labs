@@ -1,4 +1,4 @@
-# EDS 223: GEOSPATIAL ANALYSIS
+# EDS 223: GEOSPATIAL ANALYSIS 🗺️
 
 ## Purpose: 
 
