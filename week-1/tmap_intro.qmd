@@ -1,7 +1,7 @@
 ---
 title: "Week 1: Lab"
 subtitle: "Making maps with `tmap`"
-author: "Your Name"
+author: "Caitlin Nordheim-Maestas"
 date: 2025-10-2
 execute: 
   eval: true
@@ -42,9 +42,10 @@ There are MANY different ways to make maps in R, all with different pros/cons. C
 
 
 ```{r}
-install.packages("sf")
-install.packages("stars")
-install.packages("tmap")
+# already downloaded :)
+# install.packages("sf")
+# install.packages("stars")
+# install.packages("tmap")
 ```
 
 ```{r}
@@ -52,7 +53,7 @@ install.packages("tmap")
 library(sf) # for vector data (more soon!)
 library(stars) # for raster data (more soon!)
 library(tmap) # for static and interactive maps
-library(here)
+library(here) # for easy file pathing
 ```
 
 ## 3. Specifying spatial data
@@ -70,14 +71,14 @@ Let's load three spatial data objects to plot:
 ```{r}
 #| eval: false
 
-# raster of global elevations
-world_elevation <- 
+# add raster of global elevations
+world_elevation <- read_stars(here("week-1", "data", "worldelevation.tif")) # stars bc raster data # note this is a tif file
 
-# country boundaries
-world_vector <- 
+# add country boundaries
+world_vector <- read_sf(here("week-1", "data", "worldvector.gpkg")) # geopackage
 
-# major cities
-world_cities <- 
+# add major cities
+world_cities <- read_sf(here("week-1", "data", "worldcities.gpkg")) # geopackage
 
 ```
 
@@ -86,8 +87,12 @@ world_cities <-
 In `tmap`, the spatial object to plot needs to be defined within the function `tm_shape()`. This is analogous to defining the data frame to plot in `ggplot2` using `ggplot(data = )`. 
 
 Let's start by plotting the countries of the world.
-```{r}
 
+```{r}
+# plotting a single spatial object
+
+tm_shape(world_vector) + # defines the spatial object to plot
+  tm_polygons() # defines how to plot the object
 
 ```
 
