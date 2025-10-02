@@ -506,7 +506,8 @@ tm_shape(world_vector) +
           fill.legend  = tm_legend(title = "Regional Income")) +
   tm_title(text = "Global income",
             frame = TRUE)+ 
-  tm_layout(text.fontfamily = "Montserrat",
+  tm_layout(
+    #text.fontfamily = "Montserrat",
             style= "beaver",
             bg.color = "grey95")
 ```
