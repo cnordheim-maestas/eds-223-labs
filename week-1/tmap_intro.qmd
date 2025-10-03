@@ -509,9 +509,20 @@ tm_shape(world_vector) +
   tm_layout(
     #text.fontfamily = "Montserrat",
             style= "beaver",
+            #color_vision_deficiency_sim = ("protan"),
             bg.color = "grey95")
 ```
 
+customize breaks in legend
+
+```{r}
+tm_shape(world_vector) +
+  tm_polygons(fill = "gdp_per_cap", 
+              fill.scale = tm_scale(breaks = c(0, 500, 2000, 5000, Inf),
+                                    labels =c("low", "medium", "high", "very high"),
+                                    values =  viridis(8)),
+              fill.legend = tm_legend(title  = "GDP per cap"))
+```
 
 
 ## 7. Interactive options
