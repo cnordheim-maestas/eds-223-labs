@@ -198,10 +198,10 @@ Hopefully we're already thinking about how we could build checking coordinate re
 For example, we could add code like the following that transforms the CRS of `dataset2` to match `dataset1` and prints out a warning message.
 
 ```{r}
-if(st_crs(dataset1) != st_crs(dataset2)){
-  warning("coordinate refrence systems do not match")
-  dataset2 <- st_transform(dataset1, crs = st_crs(dataset1))
-}
+# if(st_crs(dataset1) != st_crs(dataset2)){
+#   warning("coordinate refrence systems do not match")
+#   dataset2 <- st_transform(dataset1, crs = st_crs(dataset1))
+# }
 ```
 :::
 
@@ -339,71 +339,90 @@ A critical part of many data science workflows is combining data sets based on c
 Let's start by looking a data set on national coffee production from the `spData` package:
 
 ```{r}
-
+coffee_data <- spData::coffee_data
+head(coffee_data)
 ```
 
 It appears that `coffee_data` contains information on the amount of coffee produced in 2016 and 2017 from a subset of countries.
 
 ```{r}
+nrow(coffee_data)
 
+nrow(world)
 ```
 
 The coffee production dataset does not include any spatial information, so If we wanted to make a map of coffee production, we would need to combine `coffee_data` with the `world` dataset. We do this by joining based on countries' names.
 
 ```{r}
+world_coffee <- left_join(world, coffee_data, by = "name_long")
 
+names(world_coffee)
 ```
 
 And plot what this looks like...
 
 ```{r}
-
+tm_shape(world_coffee) +
+  tm_fill(
+    "coffee_production_2017",
+    fill.legend = tm_legend(title = "Coffee production (2017)")
+  )
 
 ```
 
 By using a left join, our previous result added the coffee production information onto all countries of the world. If we just wanted to keep countries that do have coffee data, we could use an inner join:
 
 ```{r}
-
+world_coffee_inner <- inner_join(world, coffee_data, by = "name_long")
 ```
 
 Let's build ourselves a warning message to make sure we don't lose any data because of incomplete matches.
 
 ```{r}
-
+if (nrow(world_coffee_inner) != nrow(coffee_data)) {
+  warning("inner join does not match original data. potential data loss during join")
+}
 
 ```
 
 It looks like we lost some countries with coffee data, so let's figure out what's going on. We can find rows that didn't match using the `setdiff()` function.
 
 ```{r}
-
+setdiff(coffee_data$name_long, world$name_long)
 ```
 
 We see that one of the issues is that the two data sets use different naming conventions for the Democratic Republic of the Congo. We can use a string matching function to figure out what the DRC is called in the world data set.
 
 ```{r}
-
+# search for the DRC in the world dataset
+drc <- stringr::str_subset(world$name_long, "Dem*.+Congo")
 
 ```
 
 Now we can update the coffee data set with the matching name for the DRC:
 
 ```{r include=TRUE}
-
+coffee_data$name_long[stringr::str_detect(coffee_data$name_long, "Congo")] <- drc
 ```
 
 And we can try the inner join again and hopefully the DRC now matches:
 
 ```{r}
+world_coffee_inner <- inner_join(world, coffee_data , by = "name_long")
 
+# update warning message conditional to include the mismatch for "others"
+if (nrow(world_coffee_inner) != nrow(coffee_data) & setdiff(coffee_data$name_long, world_coffee_inner$name_long) != "Others") {
+  warning("inner join does not match original data. potential data loss during join")
+}
 
 ```
 
 Let's visualize what a the inner join did to our spatial object.
 
 ```{r}
-
+tm_shape(world_coffee_inner) +
+  tm_polygons(fill = "coffee_production_2017",
+              fill.legend = tm_legend(title = "Coffee production (2017)"))
 
 ```
 
